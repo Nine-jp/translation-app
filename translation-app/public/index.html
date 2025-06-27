@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本語⇄スペイン語 リアルタイム翻訳</title>
+    <title>Japanese ⇄ Mexican Spanish Translator</title>
     <meta name="description" content="日本語とメキシコスペイン語間のリアルタイム音声・テキスト翻訳。PWA対応でオフラインでも利用可能。">
     <meta name="theme-color" content="#4A90E2"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
@@ -33,7 +33,7 @@
                 </svg>
             </button>
             <div class="flex items-center space-x-2">
-                <label for="outputLanguage" class="text-gray-700 font-medium">出力言語:</label>
+                <label for="outputLanguage" class="text-gray-700 font-medium">To:</label>
                 <select id="outputLanguage" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition-all duration-200">
                     <option value="es-MX">🇲🇽</option>
                     <option value="ja-JP">🇯🇵</option>
@@ -43,7 +43,7 @@
 
         <!-- 入力エリア -->
         <div class="mb-6">
-            <textarea id="inputText" placeholder="翻訳したいテキストを入力するか、マイクボタンを押して話してください..."
+            <textarea id="inputText" placeholder="Enter text to translate or press the microphone button to speak..."
                       class="w-full p-4 border border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-200 resize-y min-h-[100px] text-gray-800"></textarea>
         </div>
 
