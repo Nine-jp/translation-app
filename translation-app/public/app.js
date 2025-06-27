@@ -203,11 +203,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Find a suitable voice
         const voices = speechSynthesis.getVoices();
-        let selectedVoice = voices.find(voice => voice.lang === outputLang);
+        let selectedVoice = null;
+
+        // 優先順位1: 出力言語に一致し、かつ女性の声を探す
+        selectedVoice = voices.find(voice =>
+            voice.lang === outputLang &&
+            (voice.name.includes('Female') || voice.name.includes('Woman') || voice.name.includes('Zira') || voice.name.includes('Google US English Female')) // 例: 女性の声を示すキーワード
+        );
+
+        // 優先順位2: 女性の声が見つからなければ、出力言語に一致する任意の声を探す
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang === outputLang);
+        }
+
         if (selectedVoice) {
             utterance.voice = selectedVoice;
         } else {
-            console.warn(`No voice found for language: ${outputLang}. Using default.`);
+            console.warn(`No suitable voice found for language: ${outputLang}. Using default.`);
         }
 
         speechSynthesis.speak(utterance);
