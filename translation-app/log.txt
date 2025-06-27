@@ -1,106 +1,34 @@
-## 翻訳Webアプリ開発ログ
 
-### 1. プロジェクトの初期設定とファイル作成
+## 翻訳Webアプリ開発ログ（続き）
 
-- **目的**: 日本語-スペイン語翻訳Webアプリの基本構造を構築。
-- **ファイル構成**:
-    - `index.html`: メインのHTMLファイル
-    - `app.js`: アプリケーションのロジック（フロントエンド）
-    - `style.css`: カスタムCSS
-    - `sw.js`: Service Worker（PWA対応）
-    - `manifest.json`: PWAマニフェスト
-    - `icons/`: アプリケーションアイコン（ダミーファイル作成）
-    - `log.txt`: このログファイル
+### 5. UIの多言語対応と改善
 
-### 2. バックエンドプロキシの導入とAPIキーの安全な管理
+- **目的**: アプリケーションのUIを日本語から英語表記に変更し、視覚的な分かりやすさを向上させる。
+- **変更内容**:
+    - メインタイトルを「日本語 ⇄ スペイン語 翻訳」から「🇯🇵 ⇄ 🇲🇽」に変更。
+    - 言語選択プルダウンのテキストを国旗絵文字（🇯🇵, 🇲🇽）に変更。
+    - ボタンのテキスト（「音声入力」「翻訳する」「クリア」）を英語（「Voice Input」「Translate」「Clear」）に変更。
+    - 入力テキストエリアのプレースホルダーを英語に変更。
+    - 入力言語と出力言語のラベルを「From:」と「To:」に変更。
+    - ブラウザのタブタイトルを「Japanese ⇄ Mexican Spanish Translator」に変更。
 
-- **目的**: Gemini APIキーをフロントエンドに露出させず、バックエンドで安全に管理する。
-- **技術スタック**: Node.js, Express, Axios, Dotenv
-- **手順**:
-    1.  `npm init -y` でNode.jsプロジェクトを初期化。
-    2.  `npm install express axios dotenv` で必要なパッケージをインストール。
-    3.  `.env` ファイルを作成し、Gemini APIキーを保存。
-        ```
-        GEMINI_API_KEY=AIzaSyA89wALTf-kGL9Rbpwkabd2Zs5KH8cGJrI
-        ```
-    4.  `server.js` を作成し、静的ファイルの配信とGemini APIへのプロキシエンドポイントを実装。
-        ```javascript
-        // server.js の主要部分
-        require('dotenv').config();
-        const express = require('express');
-        const axios = require('axios');
-        const path = require('path');
+### 6. 音声入力機能の強化
 
-        const app = express();
-        const port = 3000;
+- **目的**: 音声入力の開始と終了をユーザーに分かりやすく伝えるため、ビープ音を追加し、自動翻訳機能を実装する。
+- **変更内容**:
+    - `public/app.js` に `playBeep` 関数を追加し、指定された周波数と持続時間でビープ音を生成・再生できるようにした。
+    - 音声入力開始時（`voiceInputBtn.addEventListener` 内）に開始ビープ音（800Hz, 200ms）を鳴らすようにした。
+    - 音声入力終了時（`recognition.onend`）に終了ビープ音（400Hz, 200ms）を鳴らすようにした。
+    - 音声入力終了後、ビープ音の再生に続いて自動的に翻訳処理が開始されるように、翻訳ロジックを `translateText` 関数として抽出し、`recognition.onend` から呼び出すようにした。
 
-        app.use(express.json());
-        app.use(express.static(path.join(__dirname, 'public'))); // publicフォルダから静的ファイルを提供
+### 7. デバッグとトラブルシューティング
 
-        app.post('/api/translate', async (req, res) => {
-            const { text, from, to } = req.body;
-            const apiKey = process.env.GEMINI_API_KEY;
-            // ... Gemini API呼び出しロジック ...
-        });
-
-        app.listen(port, () => {
-            console.log(`サーバーが http://localhost:${port} で起動しました`);
-        });
-        ```
-    5.  フロントエンドファイル（`index.html`, `app.js` など）を `public/` ディレクトリに移動。
-        ```bash
-        move index.html public\ && move app.js public\ && move style.css public\ && move sw.js public\ && move manifest.json public\ && move icons public\
-        ```
-    6.  `public/app.js` を修正し、Gemini APIへの直接呼び出しをバックエンドの `/api/translate` エンドポイントに変更。
-        - `GEMINI_API_KEY` の定義を削除。
-        - `fetch` のURLを `/api/translate` に変更し、リクエストボディを調整。
-
-### 3. GitとGitHubへのプッシュ
-
-- **目的**: プロジェクトのバージョン管理とGitHubでの共有。
-- **手順**:
-    1.  `git add .` で全ファイルをステージング。
-    2.  `git commit -F commit_message.txt` でコミット（コミットメッセージは一時ファイルに保存）。
-        - コミットメッセージ: `feat: Initial setup of translation app with backend proxy`
-    3.  `.gitignore` を作成し、`.env` と `node_modules/` をバージョン管理から除外。
-    4.  GitHubリポジトリ (`https://github.com/Nine-jp/translation-app.git`) をリモートに追加。
-        ```bash
-        git remote add origin https://github.com/Nine-jp/translation-app.git
-        ```
-    5.  ブランチ名を `main` に変更。
-        ```bash
-        git branch -M main
-        ```
-    6.  GitHubにプッシュ。
-        ```bash
-        git push -u origin main
-        ```
-
-### 4. Herokuへのデプロイ（進行中）
-
-- **目的**: Webアプリをインターネット上で利用可能にする。
-- **Herokuの特性**: バックエンド（Node.js）を含むアプリのデプロイに適している。アプリ名は世界中でユニークである必要がある。
-- **手順（ユーザーが手動で実行する必要があるステップ）**:
-    1.  Heroku CLIのインストール（手動で実行済み）。
-    2.  Herokuにログイン。
-        ```bash
-        heroku login
-        ```
-    3.  Herokuアプリの作成（ユニークな名前で）。
-        ```bash
-        heroku create YOUR_UNIQUE_APP_NAME
-        ```
-    4.  `Procfile` を作成し、Herokuにアプリの起動方法を指示。
-        ```
-        web: node server.js
-        ```
-    5.  Herokuにプッシュしてデプロイ。
-        ```bash
-        git push heroku main
-        ```
-    6.  Herokuダッシュボードで環境変数 `GEMINI_API_KEY` を設定。
-        - **KEY**: `GEMINI_API_KEY`
-        - **VALUE**: `AIzaSyA89wALTf-kGL9Rbpwkabd2Zs5KH8cGJrI`
-        - **注意**: `Access denied` エラーは、アプリ名がユニークでない場合に発生する可能性が高い。新しいユニークなアプリ名で再試行を推奨。
+- **主な問題と解決策**:
+    - **UI変更がWebに反映されない**: ブラウザのキャッシュやService Workerが原因であることが多く、キャッシュのクリアやService Workerの登録解除で解決した。
+    - **`playBeep is not defined` エラー**: `playBeep` 関数の定義スコープの問題。`DOMContentLoaded` イベントリスナーの先頭に移動することで解決した。
+    - **ビープ音が鳴らない**: `playBeep` 関数の音量（`gainNode.gain.linearRampToValueAtTime`）を `1.0` に、持続時間を `200`ms に調整した。
+    - **`ERR_INTERNET_DISCONNECTED` エラー**: 開発者ツールのService Worker設定で「Offline」チェックボックスが有効になっていたため。チェックを外すことで解決した。
+    - **Herokuの`Boot timeout` エラー**: `server.js` がHerokuの動的な `$PORT` 環境変数にバインドしていなかったため。`const port = process.env.PORT || 3000;` に修正することで解決した。
+    - **Gemini APIの`404 Not Found` エラー**: `server.js` で指定していたGeminiモデル名が古かったため。`gemini-1.0-pro` から `gemini-2.0-flash` に変更することで解決した。
 
 ---
