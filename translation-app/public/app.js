@@ -191,25 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         speakTranslatedTextBtn.disabled = true;
     });
 
-    // 翻訳結果の読み上げ (Speech Synthesis API)
-    speakTranslatedTextBtn.addEventListener('click', () => {
-        const textToSpeak = translatedTextElement.textContent;
-        if (!textToSpeak || !speechSynthesis) return;
-
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        utterance.lang = outputLang;
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-
-        // --- デバッグログの追加 ---
-        console.log('Current outputLang:', outputLang);
-        const voices = speechSynthesis.getVoices();
-        console.log('Available voices:');
-        voices.forEach(voice => {
-            console.log(`  Name: ${voice.name}, Lang: ${voice.lang}, Default: ${voice.default}`);
-        });
-        // --- デバッグログの追加ここまで ---
-
+    const voices = speechSynthesis.getVoices();
         let selectedVoice = null;
         const baseOutputLang = outputLang.split('-')[0]; // 例: 'es-MX' から 'es' を抽出
 
@@ -239,21 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedVoice) {
             utterance.voice = selectedVoice;
-            // --- デバッグログの追加 ---
-            console.log(`Selected voice: Name: ${selectedVoice.name}, Lang: ${selectedVoice.lang}`);
-            // --- デバッグログの追加ここまで ---
         } else {
             console.warn(`No suitable voice found for language: ${outputLang}. Using default.`);
         }
-
-        // --- イベントリスナーの追加 ---
-        utterance.onend = () => {
-            console.log('Speech finished.');
-        };
-        utterance.onerror = (event) => {
-            console.error('Speech error:', event.error);
-        };
-        // --- イベントリスナーの追加ここまで ---
 
         speechSynthesis.speak(utterance);
     });
