@@ -203,6 +203,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Find a suitable voice
         const voices = speechSynthesis.getVoices();
+
+        // --- デバッグログの追加 ---
+        console.log('Available voices:');
+        voices.forEach(voice => {
+            console.log(`  Name: ${voice.name}, Lang: ${voice.lang}, Default: ${voice.default}`);
+        });
+        console.log(`Attempting to find voice for outputLang: ${outputLang}`);
+        // --- デバッグログの追加ここまで ---
+
         let selectedVoice = null;
 
         // 優先順位1: 出力言語に一致し、かつ女性の声を探す
@@ -218,6 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedVoice) {
             utterance.voice = selectedVoice;
+            // --- デバッグログの追加 ---
+            console.log(`Selected voice: Name: ${selectedVoice.name}, Lang: ${selectedVoice.lang}`);
+            // --- デバッグログの追加ここまで ---
         } else {
             console.warn(`No suitable voice found for language: ${outputLang}. Using default.`);
         }
