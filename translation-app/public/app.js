@@ -201,21 +201,29 @@ document.addEventListener('DOMContentLoaded', () => {
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
 
+        // --- デバッグログの追加 ---
+        console.log('Current outputLang:', outputLang);
         const voices = speechSynthesis.getVoices();
+        console.log('Available voices:');
+        voices.forEach(voice => {
+            console.log(`  Name: ${voice.name}, Lang: ${voice.lang}, Default: ${voice.default}`);
+        });
+        // --- デバッグログの追加ここまで ---
+
         let selectedVoice = null;
         const baseOutputLang = outputLang.split('-')[0]; // 例: 'es-MX' から 'es' を抽出
 
         // 優先順位1: 特定の出力言語 (例: es-MX) に一致し、かつ女性の声を探す
         selectedVoice = voices.find(voice =>
             voice.lang === outputLang &&
-            (voice.name.includes('Female') || voice.name.includes('Woman') || voice.name.includes('Zira') || voice.name.includes('Google US English Female'))
+            (voice.name.includes('Female') || voice.name.includes('Woman') || voice.name.includes('Zira') || voice.name.includes('Google US English Female') || voice.name.includes('Haruka') || voice.name.includes('Sayaka')) // 日本語の女性の声も追加
         );
 
         // 優先順位2: 基本の出力言語 (例: es) に一致し、かつ女性の声を探す
         if (!selectedVoice) {
             selectedVoice = voices.find(voice =>
                 voice.lang.startsWith(baseOutputLang) && // 'es' で始まる音声 (es-ES, es-MXなど) を探す
-                (voice.name.includes('Female') || voice.name.includes('Woman') || voice.name.includes('Zira') || voice.name.includes('Google US English Female'))
+                (voice.name.includes('Female') || voice.name.includes('Woman') || voice.name.includes('Zira') || voice.name.includes('Google US English Female') || voice.name.includes('Haruka') || voice.name.includes('Sayaka')) // 日本語の女性の声も追加
             );
         }
 
@@ -231,9 +239,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedVoice) {
             utterance.voice = selectedVoice;
+            // --- デバッグログの追加 ---
+            console.log(`Selected voice: Name: ${selectedVoice.name}, Lang: ${selectedVoice.lang}`);
+            // --- デバッグログの追加ここまで ---
         } else {
             console.warn(`No suitable voice found for language: ${outputLang}. Using default.`);
         }
+
+        // --- イベントリスナーの追加 ---
+        utterance.onend = () => {
+            console.log('Speech finished.');
+        };
+        utterance.onerror = (event) => {
+            console.error('Speech error:', event.error);
+        };
+        // --- イベントリスナーの追加ここまで ---
 
         speechSynthesis.speak(utterance);
     });
