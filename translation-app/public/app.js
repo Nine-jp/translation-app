@@ -1,4 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ビープ音を生成して再生する関数
+    function playBeep(frequency, duration) {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.value = frequency; // 周波数 (Hz)
+        oscillator.type = 'sine'; // 波形タイプ (sine, square, sawtooth, triangle)
+
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(1.0, audioContext.currentTime + 0.01); // フェードイン
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + (duration / 1000)); // フェードアウト
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + (duration / 1000));
+    }
+
     // DOM要素の取得
     const inputLanguageSelect = document.getElementById('inputLanguage');
     const outputLanguageSelect = document.getElementById('outputLanguage');
