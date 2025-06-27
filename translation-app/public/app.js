@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!recognition) {
         voiceInputBtn.disabled = true;
         voiceInputBtn.textContent = '音声認識は非対応です';
-        showMessage('お使いのブラウザは音声認識に対応していません。', 'warning');
+        showMessage('Your browser does not support speech recognition.', 'warning');
     }
 
     if (!speechSynthesis) {
@@ -91,25 +91,25 @@ document.addEventListener('DOMContentLoaded', () => {
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
-        voiceInputBtn.textContent = '認識中...';
+        voiceInputBtn.textContent = 'Listening...';
         voiceInputBtn.disabled = true;
 
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
             inputTextarea.value = transcript;
-            voiceInputBtn.textContent = '音声入力';
+            voiceInputBtn.textContent = 'Voice Input';
             voiceInputBtn.disabled = false;
         };
 
         recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
             showMessage(`音声認識エラー: ${event.error}`, 'error');
-            voiceInputBtn.textContent = '音声入力';
+            voiceInputBtn.textContent = 'Voice Input';
             voiceInputBtn.disabled = false;
         };
 
         recognition.onend = () => {
-            voiceInputBtn.textContent = '音声入力';
+            voiceInputBtn.textContent = 'Voice Input';
             voiceInputBtn.disabled = false;
         };
 
@@ -151,11 +151,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 translatedTextElement.textContent = result.translatedText;
                 speakTranslatedTextBtn.disabled = false; // 翻訳が成功したら読み上げボタンを有効化
             } else {
-                showMessage('翻訳結果が見つかりませんでした。', 'error');
+                showMessage('Translation result not found.', 'error');
             }
         } catch (error) {
-            console.error('翻訳エラー:', error);
-            showMessage(`翻訳中にエラーが発生しました: ${error.message}`, 'error');
+            console.error('Translation error:', error);
+            showMessage(`An error occurred during translation: ${error.message}`, 'error');
         } finally {
             toggleLoading(false);
         }
