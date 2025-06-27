@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!recognition) {
         voiceInputBtn.disabled = true;
-        voiceInputBtn.textContent = '音声認識は非対応です';
+        voiceInputBtn.textContent = 'Speech recognition not supported';
         showMessage('Your browser does not support speech recognition.', 'warning');
     }
 
     if (!speechSynthesis) {
         speakTranslatedTextBtn.disabled = true;
-        showMessage('お使いのブラウザは音声合成に対応していません。', 'warning');
+        showMessage('Your browser does not support speech synthesis.', 'warning');
     }
 
     // --- 関数定義 ---
@@ -103,13 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
-            showMessage(`音声認識エラー: ${event.error}`, 'error');
+            showMessage(`Speech recognition error: ${event.error}`, 'error');
             voiceInputBtn.textContent = 'Voice Input';
             voiceInputBtn.disabled = false;
         };
 
         recognition.onend = () => {
-            playBeep(400, 100); // 終了ビープ音
+            playBeep(400, 200); // 終了ビープ音
             voiceInputBtn.textContent = 'Voice Input';
             voiceInputBtn.disabled = false;
         };
