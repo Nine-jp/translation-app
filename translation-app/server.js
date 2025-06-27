@@ -26,7 +26,7 @@ app.post('/api/translate', async (req, res) => {
     const prompt = `以下のテキストを${fromLang}から${toLang}に翻訳してください。翻訳結果のテキストだけを返してください。\n\nテキスト: "${text}"`;
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
         const response = await axios.post(url, {
             contents: [{ parts: [{ text: prompt }] }]
         });
