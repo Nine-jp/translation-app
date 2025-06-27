@@ -137,11 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
         recognition.start();
     });
 
-    // テキスト翻訳 (Gemini API)
-    translateBtn.addEventListener('click', async () => {
+    // テキスト翻訳 (Gemini API) 関数
+    async function translateText() {
         const textToTranslate = inputTextarea.value.trim();
         if (!textToTranslate) {
-            showMessage('翻訳したいテキストを入力してください。');
+            showMessage('Please enter text to translate.');
             return;
         }
 
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const fromLang = (inputLang === 'ja-JP') ? '日本語' : 'メキシコスペイン語';
         const toLang = (outputLang === 'ja-JP') ? '日本語' : 'メキシコスペイン語';
-        const prompt = `以下のテキストを${fromLang}から${toLang}に翻訳してください。翻訳結果のテキストだけを返してください。\n\nテキスト: "${textToTranslate}"`;
+        const prompt = `以下のテキストを${fromLang}から${toLang}に翻訳してください。翻訳結果のテキストだけを返してください.\n\nテキスト: "${textToTranslate}"`;
 
         try {
             const response = await fetch('/api/translate', {
@@ -180,7 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             toggleLoading(false);
         }
-    });
+    }
+
+    translateBtn.addEventListener('click', translateText);
 
     // クリアボタン
     clearBtn.addEventListener('click', () => {
