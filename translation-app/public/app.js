@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         recognition.onend = () => {
+            playBeep(400, 100); // 終了ビープ音
             voiceInputBtn.textContent = 'Voice Input';
             voiceInputBtn.disabled = false;
         };
