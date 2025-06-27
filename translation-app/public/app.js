@@ -201,19 +201,32 @@ document.addEventListener('DOMContentLoaded', () => {
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
 
-        // Find a suitable voice
         const voices = speechSynthesis.getVoices();
         let selectedVoice = null;
+        const baseOutputLang = outputLang.split('-')[0]; // 例: 'es-MX' から 'es' を抽出
 
-        // 優先順位1: 出力言語に一致し、かつ女性の声を探す
+        // 優先順位1: 特定の出力言語 (例: es-MX) に一致し、かつ女性の声を探す
         selectedVoice = voices.find(voice =>
             voice.lang === outputLang &&
-            (voice.name.includes('Female') || voice.name.includes('Woman') || voice.name.includes('Zira') || voice.name.includes('Google US English Female')) // 例: 女性の声を示すキーワード
+            (voice.name.includes('Female') || voice.name.includes('Woman') || voice.name.includes('Zira') || voice.name.includes('Google US English Female'))
         );
 
-        // 優先順位2: 女性の声が見つからなければ、出力言語に一致する任意の声を探す
+        // 優先順位2: 基本の出力言語 (例: es) に一致し、かつ女性の声を探す
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice =>
+                voice.lang.startsWith(baseOutputLang) && // 'es' で始まる音声 (es-ES, es-MXなど) を探す
+                (voice.name.includes('Female') || voice.name.includes('Woman') || voice.name.includes('Zira') || voice.name.includes('Google US English Female'))
+            );
+        }
+
+        // 優先順位3: 特定の出力言語 (例: es-MX) に一致する任意の声を探す (性別不問)
         if (!selectedVoice) {
             selectedVoice = voices.find(voice => voice.lang === outputLang);
+        }
+
+        // 優先順位4: 基本の出力言語 (例: es) に一致する任意の声を探す (性別不問)
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang.startsWith(baseOutputLang));
         }
 
         if (selectedVoice) {
