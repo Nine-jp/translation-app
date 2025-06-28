@@ -46,6 +46,30 @@ document.addEventListener('DOMContentLoaded', () => {
         voiceInputBtn.disabled = true;
         voiceInputBtn.textContent = 'Speech recognition not supported';
         showMessage('Your browser does not support speech recognition.', 'warning');
+    } else {
+        // 音声認識の初期設定
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        recognition.lang = inputLang;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            inputTextarea.value = transcript;
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            showMessage(`Speech recognition error: ${event.error}`, 'error');
+            // エラー時もボタンの状態を元に戻す
+            voiceInputBtn.textContent = 'Voice Input';
+            voiceInputBtn.disabled = false;
+        };
+
+        recognition.onend = () => {
+            playBeep(400, 200); // 終了ビープ音
+            voiceInputBtn.textContent = 'Voice Input';
+            voiceInputBtn.disabled = false;
+        };
     }
 
     if (!speechSynthesis) {
@@ -80,6 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 言語選択の変更イベントリスナー
     inputLanguageSelect.addEventListener('change', (e) => {
         inputLang = e.target.value;
+        if (recognition) {
+            recognition.lang = inputLang;
+        }
         // 入力言語が変わったら、出力言語が同じにならないように調整
         if (inputLang === outputLang) {
             outputLang = (inputLang === 'ja-JP') ? 'es-MX' : 'ja-JP';
@@ -101,39 +128,17 @@ document.addEventListener('DOMContentLoaded', () => {
         [inputLang, outputLang] = [outputLang, inputLang];
         inputLanguageSelect.value = inputLang;
         outputLanguageSelect.value = outputLang;
+        if (recognition) {
+            recognition.lang = inputLang;
+        }
     });
 
     // 音声入力
     voiceInputBtn.addEventListener('click', () => {
         if (!recognition) return;
 
-        recognition.lang = inputLang;
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-
         voiceInputBtn.textContent = 'Listening...';
         voiceInputBtn.disabled = true;
-
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            inputTextarea.value = transcript;
-            voiceInputBtn.textContent = 'Voice Input';
-            voiceInputBtn.disabled = false;
-        };
-
-        recognition.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
-            showMessage(`Speech recognition error: ${event.error}`, 'error');
-            voiceInputBtn.textContent = 'Voice Input';
-            voiceInputBtn.disabled = false;
-        };
-
-        recognition.onend = () => {
-            playBeep(400, 200); // 終了ビープ音
-            voiceInputBtn.textContent = 'Voice Input';
-            voiceInputBtn.disabled = false;
-        };
-
         recognition.start();
     });
 
