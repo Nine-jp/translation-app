@@ -37,21 +37,7 @@ app.post('/api/translate', async (req, res) => {
         }, { responseType: 'stream' });
 
         response.data.on('data', (chunk) => {
-            const lines = chunk.toString().split('\n');
-            for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    const jsonStr = line.substring(6);
-                    try {
-                        const json = JSON.parse(jsonStr);
-                        if (json.candidates && json.candidates[0].content.parts[0].text) {
-                            // Send only the translated text as SSE
-                            res.write(`data: ${JSON.stringify({ translatedText: json.candidates[0].content.parts[0].text })}\n\n`);
-                        }
-                    } catch (e) {
-                        // Ignore JSON parse errors for incomplete lines
-                    }
-                }
-            }
+            res.write(chunk);
         });
 
         response.data.on('end', () => {
