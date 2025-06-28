@@ -23,22 +23,31 @@ app.post('/api/translate', async (req, res) => {
 
     const fromLang = (from === 'ja-JP') ? '日本語' : 'メキシコスペイン語';
     const toLang = (to === 'ja-JP') ? '日本語' : 'メキシコスペイン語';
-    const prompt = `以下のテキストを${fromLang}から${toLang}に翻訳してください。翻訳結果のテキストだけを返してください。\n\nテキスト: "${text}"`;
+    const prompt = `以下のテキストを${fromLang}から${toLang}に翻訳してください。翻訳結果のテキストだけを返してください.\n\nテキスト: "${text}"`;
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}`;
+        
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Transfer-Encoding', 'chunked');
+
         const response = await axios.post(url, {
             contents: [{ parts: [{ text: prompt }] }]
+        }, { responseType: 'stream' });
+
+        response.data.on('data', (chunk) => {
+            res.write(chunk);
         });
 
-        if (response.data.candidates && response.data.candidates.length > 0) {
-            res.json({ translatedText: response.data.candidates[0].content.parts[0].text });
-        } else {
-            res.status(500).json({ error: '翻訳結果が見つかりませんでした。' });
-        }
+        response.data.on('end', () => {
+            res.end();
+        });
+
     } catch (error) {
         console.error('Google API Error:', error.response ? error.response.data : error.message);
-        res.status(500).json({ error: '翻訳中にエラーが発生しました。' });
+        if (!res.headersSent) {
+            res.status(500).json({ error: '翻訳中にエラーが発生しました。' });
+        }
     }
 });
 

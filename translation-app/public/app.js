@@ -154,10 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
         speakTranslatedTextBtn.disabled = true;
         translatedTextElement.textContent = '';
 
-        const fromLang = (inputLang === 'ja-JP') ? '日本語' : 'メキシコスペイン語';
-        const toLang = (outputLang === 'ja-JP') ? '日本語' : 'メキシコスペイン語';
-        const prompt = `以下のテキストを${fromLang}から${toLang}に翻訳してください。翻訳結果のテキストだけを返してください.\n\nテキスト: "${textToTranslate}"`;
-
         try {
             const response = await fetch('/api/translate', {
                 method: 'POST',
@@ -172,13 +168,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(errorData.error.message || `HTTP error! status: ${response.status}`);
             }
 
-            const result = await response.json();
-            if (result.translatedText) {
-                translatedTextElement.textContent = result.translatedText;
-                speakTranslatedTextBtn.disabled = false; // 翻訳が成功したら読み上げボタンを有効化
-            } else {
-                showMessage('Translation result not found.', 'error');
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const jsonStr = line.substring(6);
+                        try {
+                            const json = JSON.parse(jsonStr);
+                            if (json.candidates && json.candidates[0].content.parts[0].text) {
+                                fullText += json.candidates[0].content.parts[0].text;
+                                translatedTextElement.textContent = fullText;
+                            }
+                        } catch (e) {
+                            // JSON parse error, ignore
+                        }
+                    }
+                }
             }
+            speakTranslatedTextBtn.disabled = false;
+
         } catch (error) {
             console.error('Translation error:', error);
             showMessage(`An error occurred during translation: ${error.message}`, 'error');
