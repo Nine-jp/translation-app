@@ -213,7 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
         speakTranslatedTextBtn.disabled = true;
     });
 
-    const voices = speechSynthesis.getVoices();
+    speakTranslatedTextBtn.addEventListener('click', () => {
+        const utterance = new SpeechSynthesisUtterance(translatedTextElement.textContent);
+        const voices = speechSynthesis.getVoices();
         let selectedVoice = null;
         const baseOutputLang = outputLang.split('-')[0]; // 例: 'es-MX' から 'es' を抽出
 
