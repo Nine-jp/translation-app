@@ -294,6 +294,21 @@ document.addEventListener('DOMContentLoaded', () => {
             window.initMap = initMap; // グローバルに設定してAPIロード後に呼び出されるようにする
         }
     });
+
+    // 情報パネルのトグル機能
+    const toggleButton = document.getElementById('toggle-panel-button');
+    const infoPanel = document.getElementById('info-panel');
+
+    if (toggleButton && infoPanel) {
+        toggleButton.addEventListener('click', () => {
+            infoPanel.classList.toggle('minimized');
+            if (infoPanel.classList.contains('minimized')) {
+                toggleButton.textContent = '書を開く';
+            } else {
+                toggleButton.textContent = '書を閉じる';
+            }
+        });
+    }
 });
 
 // ストーリーアニメーションを開始する関数

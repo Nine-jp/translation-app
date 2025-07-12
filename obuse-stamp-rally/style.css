@@ -137,11 +137,14 @@ body {
 /* Main Game Container */
 #main-game-container {
     z-index: 1;
+    position: relative; /* For absolute positioning of info-panel */
+    width: 100%;
+    height: 100%;
 }
 
 #map-container {
     width: 100%;
-    height: calc(100vh - 25vh);
+    height: 100vh; /* Map always full screen */
     position: relative;
 }
 
@@ -311,21 +314,43 @@ button {
 
 /* レスポンシブデザインの調整 */
 @media (max-width: 768px) {
-    body {
-        flex-direction: column; /* スマホでは縦並び */
-    }
-
-    #map-container {
-        height: 60vh; /* マップの高さ */
-    }
-
     #info-panel {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
         height: 40vh; /* 情報パネルの高さ */
         padding: 10px;
+        transition: bottom 0.3s ease; /* スムーズなアニメーション */
+        z-index: 2; /* マップより手前 */
+        background-color: #f0f0d0; /* 背景色を再設定 */
+    }
+
+    #info-panel.minimized {
+        bottom: -40vh; /* 画面外に隠す */
+    }
+
+    #toggle-panel-button {
+        position: absolute;
+        bottom: 40vh; /* パネルの上端に配置 */
+        right: 10px;
+        background-color: #666;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px 5px 0 0; /* 上角を丸める */
+        cursor: pointer;
+        z-index: 3; /* パネルより手前 */
+        transition: bottom 0.3s ease;
+    }
+
+    #info-panel.minimized + #toggle-panel-button {
+        bottom: 0; /* パネルが隠れたら、ボタンは画面下部に移動 */
     }
 
     #site-title {
         font-size: 1em;
+        margin-top: 0;
     }
 
     #spot-details h2,
