@@ -1,0 +1,6 @@
+
+
+# Security: exclude log files
+*.log
+log.txt
+**/log.txt
